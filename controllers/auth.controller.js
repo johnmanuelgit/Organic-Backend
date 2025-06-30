@@ -39,10 +39,9 @@ exports.login = async (req, res) => {
   });
 };
 
-// Public profile route (no authentication required)
+
 exports.profile = async (req, res) => {
   try {
-    // Fetch the user profile without password field
     const user = await User.findById(req.params.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

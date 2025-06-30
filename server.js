@@ -32,6 +32,8 @@ app.use('/api/cart', require('./router/cart'));
 app.use('/payment', require('./router/payment'));
 app.use('/api/products', require('./router/shop'));
 app.use('/api/admin', adminRoutes);
+app.use('/api/product-reviews', require('./router/reviewRoutes'));
+app.use('/api/blogs',require('./router/blogRoutes'));
 
 
 app.get('/', (req, res) => res.send("Server is working!"));
