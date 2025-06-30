@@ -1,22 +1,11 @@
 const Blog = require('../models/blogModel');
-const fs = require('fs');
-const path = require('path');
 
 exports.getAllBlogs = async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
-    res.status(200).json({
-      status: 'success',
-      results: blogs.length,
-      data: {
-        blogs
-      }
-    });
+    res.json(blogs);
   } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -24,56 +13,67 @@ exports.getBlogById = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
     if (!blog) {
-      return res.status(404).json({
-        status: 'fail',
-        message: 'Blog not found'
-      });
+      return res.status(404).json({ message: 'Blog not found' });
     }
-    res.status(200).json({
-      status: 'success',
-      data: {
-        blog
-      }
-    });
+    res.json(blog);
   } catch (error) {
-    res.status(500).json({
-      status: 'error',
-      message: error.message
-    });
+    res.status(500).json({ message: error.message });
   }
 };
 
 exports.createBlog = async (req, res) => {
   try {
-    const { title, category, content } = req.body;
+    const { title, description } = req.body;
     const imagePath = req.file ? `/uploads/${req.file.filename}` : '';
 
-    const newBlog = await Blog.create({
+    const newBlog = new Blog({
       title,
-      image: imagePath,
-      category,
-      content,
-      author: req.body.author || 'Admin'
+      description,
+      image: imagePath
     });
 
-    res.status(201).json({
-      status: 'success',
-      data: {
-        blog: newBlog
-      }
-    });
+    await newBlog.save();
+    res.status(201).json(newBlog);
   } catch (error) {
-    // Remove uploaded file if there's an error
-    if (req.file) {
-      fs.unlink(path.join(__dirname, '../uploads', req.file.filename), err => {
-        if (err) console.error('Error deleting file:', err);
-      });
-    }
-    res.status(400).json({
-      status: 'error',
-      message: error.message
-    });
+    res.status(400).json({ message: error.message });
   }
 };
 
-exports.updateBlog = asy
+exports.updateBlog = async (req, res) => {
+  try {
+    const { title, description } = req.body;
+    const updateData = { title, description };
+
+    if (req.file) {
+      updateData.image = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedBlog = await Blog.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true }
+    );
+
+    if (!updatedBlog) {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+
+    res.json(updatedBlog);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+exports.deleteBlog = async (req, res) => {
+  try {
+    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+    
+    if (!deletedBlog) {
+      return res.status(404).json({ message: 'Blog not found' });
+    }
+
+    res.json({ message: 'Blog deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

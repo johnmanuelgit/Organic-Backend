@@ -7,13 +7,13 @@ const app = express();
 const session = require('express-session');
 
 app.use(session({
-  secret: 'your_secret_key',           // Use env variable in production
+  secret: 'your_secret_key',
   resave: false,
   saveUninitialized: true,
   cookie: {
-    secure: false,                     // true if HTTPS
+    secure: false, 
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000        // 1 day
+    maxAge: 24 * 60 * 60 * 1000    
   }
 }));
 dotenv.config();

@@ -1,22 +1,27 @@
 const express = require('express');
+const { getAllBlogs, getBlogById, createBlog, updateBlog, deleteBlog } = require('../controllers/blogController');
 const multer = require('multer');
-const { getAllBlogs, createBlog } = require('../controllers/blogController');
+const path = require('path');
 
 const router = express.Router();
 
+// Multer storage configuration
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');  // Ensure 'uploads' folder exists
+  destination: (req, file, cb) => {
+    cb(null, 'uploads/'); // Make sure 'uploads' folder exists
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + '-' + file.originalname);
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + '-' + file.originalname);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
+// Routes
 router.get('/', getAllBlogs);
+router.get('/:id', getBlogById);
 router.post('/', upload.single('image'), createBlog);
+router.put('/:id', upload.single('image'), updateBlog);
+router.delete('/:id', deleteBlog);
 
 module.exports = router;
