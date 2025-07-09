@@ -1,16 +1,15 @@
 const Razorpay = require("razorpay");
 
 const instance = new Razorpay({
-  key_id: 'rzp_test_QIN4sfPHDDt9hq',
-  key_secret: 'GbpVMOkKsleNkBRwRTqQe53s'
+  key_id: "rzp_test_QIN4sfPHDDt9hq",
+  key_secret: "GbpVMOkKsleNkBRwRTqQe53s",
 });
 
-// Create order (No authentication)
-exports.payments =  async (req, res) => {
+exports.payments = async (req, res) => {
   const { amount, currency } = req.body;
 
   const options = {
-    amount: amount * 100, // Convert to paise
+    amount: amount * 100,
     currency: currency || "INR",
     receipt: "receipt_order_" + new Date().getTime(),
   };

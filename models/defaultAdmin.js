@@ -1,7 +1,7 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
-const defaultadmin= new mongoose.Schema({
- username: {
+const defaultadmin = new mongoose.Schema({
+  username: {
     type: String,
     required: true,
     unique: true,
@@ -19,10 +19,10 @@ const defaultadmin= new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'superadmin'],
-    default: 'admin',
+    enum: ["admin", "superadmin"],
+    default: "admin",
   },
-    
+
   isActive: {
     type: Boolean,
     default: true,
@@ -32,6 +32,6 @@ const defaultadmin= new mongoose.Schema({
     incomeExpense: { type: Boolean, default: false },
     members: { type: Boolean, default: false },
     user: { type: Boolean, default: false },
-  }
-})
-module.exports = mongoose.model('defaultadmin',defaultadmin)
+  },
+});
+module.exports = mongoose.model("defaultadmin", defaultadmin);
