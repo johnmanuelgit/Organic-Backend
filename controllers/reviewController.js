@@ -13,21 +13,24 @@ exports.getProductReviews = async (req, res) => {
   }
 };
 
+
 exports.addReview = async (req, res) => {
   try {
     const { id } = req.params;
-    const { rating, comment } = req.body;
+    const { rating, comment, userName, userImageUrl } = req.body;
 
-    if (!rating || !comment) {
+    if (!rating || !comment || !userName) {
       return res
         .status(400)
-        .json({ message: "Rating and comment are required" });
+        .json({ message: "Rating, comment, and userName are required" });
     }
 
     const review = new Review({
       productId: id,
       rating,
       comment,
+      userName,
+      userImageUrl, // Optional
     });
 
     await review.save();

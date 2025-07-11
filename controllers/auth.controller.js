@@ -31,11 +31,19 @@ exports.login = async (req, res) => {
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
-  res.send({
-    message: "Welcome back, already registered user!",
-    user: { _id: user._id, name: user.name, email: user.email },
-    token,
-  });
+ res.send({
+  message: "Welcome back, already registered user!",
+  user: {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+    address: user.address,
+    imageUrl: user.imageUrl,
+  },
+  token,
+});
+
 };
 
 exports.profile = async (req, res) => {
@@ -54,6 +62,7 @@ exports.updateProfile = async (req, res) => {
   try {
     const userId = req.params.id;
 
+    // Get fields from request body
     const updatedFields = {
       name: req.body.name,
       email: req.body.email,
@@ -61,14 +70,23 @@ exports.updateProfile = async (req, res) => {
       address: req.body.address,
     };
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, { new: true }).select("-password");
+    // ✅ If a file is uploaded, save its filename
+    if (req.file) {
+      updatedFields.imageUrl = `/uploads/${req.file.filename}`;
+    }
+
+    // Update and return the updated user (excluding password)
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedFields, {
+      new: true,
+    }).select("-password");
 
     if (!updatedUser) return res.status(404).json({ message: "User not found" });
 
-    res.json({ message: "Profile updated successfully", user: updatedUser });
+    res.json({ message: "Profile updated successfully", updatedUser });
   } catch (err) {
     console.error("Update error:", err);
     res.status(500).json({ message: "Error updating profile" });
   }
 };
+
 

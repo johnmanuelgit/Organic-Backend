@@ -16,6 +16,14 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  userName: {
+    type: String,
+    required: true,
+  },
+  userImageUrl: {
+    type: String,
+    default: '',
+  },
   createdAt: {
     type: Date,
     default: Date.now,
