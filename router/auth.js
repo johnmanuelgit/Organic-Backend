@@ -19,6 +19,9 @@ const upload = multer({ storage });
 router.post("/register", authcontroller.register);
 router.post("/login", authcontroller.login);
 router.get("/profile/:id", authcontroller.profile);
+router.post('/forgot-password', authcontroller.forgotPassword);
+router.post('/reset-password/:token', authcontroller.resetPassword);
+
 
 // ✅ Use `upload.single("image")` to accept one file with key name 'image'
 router.put("/profile/:id", upload.single("image"), authcontroller.updateProfile);
