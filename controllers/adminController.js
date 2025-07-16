@@ -131,9 +131,8 @@ exports.forgotPassword = async (req, res) => {
         console.log("Email transporter verified"); 
 
         
-        const resetUrl = `${
-          process.env.FRONTEND_URL
-        }/reset-password?token=${token}`;
+      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
+
 
         const mailOptions = {
           from: process.env.EMAIL_USERNAME, 
@@ -249,6 +248,7 @@ exports.resetPassword = async (req, res) => {
     });
   }
 };
+
 
 exports.forgotUsername = async (req, res) => {
   try {

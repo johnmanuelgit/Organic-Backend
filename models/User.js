@@ -16,10 +16,18 @@ const userSchema = new mongoose.Schema({
   address: {
     type: String,
   },
-   imageUrl: {type:String,},
+  imageUrl: {
+    type: String,
+  },
   password: {
     type: String,
     required: true,
+  },
+  resetPasswordToken: {
+    type: String,
+  },
+  resetPasswordExpires: {
+    type: Date,
   },
 });
 

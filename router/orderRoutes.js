@@ -1,14 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const orderController = require('../controllers/orderController');
+const middleware = require('../middleware/auth');
 
 // POST: COD
-router.post('/orders/cod', orderController.placeCodOrder);
+router.post('/orders/cod', middleware,orderController.placeCodOrder);
 
 // POST: Razorpay
-router.post('/orders/online', orderController.confirmOnlinePayment);
-router.get('/orders', orderController.getAllOrders);
-router.put('/orders/:id/status', orderController.updateOrderStatus);
+router.post('/orders/online',middleware, orderController.confirmOnlinePayment);
+router.get('/orders',middleware, orderController.getAllOrders);
+router.put('/orders/:id/status',middleware, orderController.updateOrderStatus);
 
 
 module.exports = router;

@@ -111,12 +111,18 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${
           process.env.FRONTEND_URL
-        }/reset-password/${resetToken}`;
+        }/user-reset-password/${resetToken}`;
     const html = `
       <h3>Hi ${user.name || 'User'},</h3>
       <p>You requested a password reset.</p>
       <p>Click the link below to reset your password:</p>
-      <a href="${resetLink}" style="color:blue">${resetLink}</a>
+       <a href="${resetLink}" style="color:black ">${resetLink}</a><br>
+      <a href="${resetLink}" 
+                   style="background-color:#dd6b20; color: white; padding: 12px 30px; 
+                          text-decoration: none; border-radius: 5px; display: inline-block;">
+                  Reset Password
+                </a>
+     
       <p>This link will expire in 1 hour.</p>
     `;
 
@@ -143,11 +149,9 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// RESET PASSWORD
 exports.resetPassword = async (req, res) => {
   try {
-    const token = req.params.token;
-    const { password } = req.body;
+    const { token, password } = req.body;
 
     const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
 
@@ -156,18 +160,20 @@ exports.resetPassword = async (req, res) => {
       resetPasswordExpires: { $gt: Date.now() },
     });
 
-    if (!user) return res.status(400).json({ message: "Token invalid or expired" });
+    if (!user) {
+      return res.status(400).json({ message: "Token invalid or expired" });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
-
     await user.save();
 
     res.json({ message: "Password has been reset successfully" });
   } catch (err) {
-    console.error("Reset Password Error:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
+
+
