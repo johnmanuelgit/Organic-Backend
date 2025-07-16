@@ -14,7 +14,7 @@ exports.login = async (req, res) => {
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
       return res
         .status(401)
-        .json({ status: "error", message: "Invalid credentials" });
+        .json({ status: "error", message: "please enter valid username,password" });
     }
 
     if (!admin.isActive) {
