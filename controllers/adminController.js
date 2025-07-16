@@ -14,7 +14,10 @@ exports.login = async (req, res) => {
     if (!admin || !(await bcrypt.compare(password, admin.password))) {
       return res
         .status(401)
-        .json({ status: "error", message: "please enter valid username,password" });
+        .json({
+          status: "error",
+          message: "please enter valid username,password",
+        });
     }
 
     if (!admin.isActive) {
@@ -65,9 +68,8 @@ exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
 
-    console.log("Forgot password request for email:", email); 
+    console.log("Forgot password request for email:", email);
 
-    
     if (!email) {
       return res.status(400).json({
         status: "error",
@@ -75,7 +77,6 @@ exports.forgotPassword = async (req, res) => {
       });
     }
 
-    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -85,28 +86,24 @@ exports.forgotPassword = async (req, res) => {
     }
 
     const admin = await Admin.findOne({ email });
-    console.log("Admin found:", admin ? "Yes" : "No"); 
+    console.log("Admin found:", admin ? "Yes" : "No");
 
-    
     const responseMessage =
       "If this email exists in our system, you will receive a password reset link shortly";
 
     if (admin) {
       try {
-        
         const token = crypto.randomBytes(32).toString("hex");
 
-        
         admin.resetToken = token;
-        admin.resetTokenExpiry = new Date(Date.now() + 3600000); 
+        admin.resetTokenExpiry = new Date(Date.now() + 3600000);
         await admin.save();
 
-        console.log("Reset token generated and saved"); 
+        console.log("Reset token generated and saved");
 
-        
         if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
           console.error("Email credentials not configured");
-          
+
           return res.json({
             status: "success",
             message: responseMessage,
@@ -119,23 +116,20 @@ exports.forgotPassword = async (req, res) => {
             user: process.env.EMAIL_USERNAME,
             pass: process.env.EMAIL_PASSWORD,
           },
-          
+
           secure: true,
           tls: {
             rejectUnauthorized: false,
           },
         });
 
-        
         await transporter.verify();
-        console.log("Email transporter verified"); 
+        console.log("Email transporter verified");
 
-        
-      const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
-
+        const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 
         const mailOptions = {
-          from: process.env.EMAIL_USERNAME, 
+          from: process.env.EMAIL_USERNAME,
           to: email,
           subject: "Password Reset Request - Admin Portal",
           html: `
@@ -163,13 +157,10 @@ exports.forgotPassword = async (req, res) => {
           `,
         };
 
-        
         const info = await transporter.sendMail(mailOptions);
-        console.log("Email sent successfully:", info.messageId); 
+        console.log("Email sent successfully:", info.messageId);
       } catch (emailError) {
         console.error("Email sending error:", emailError);
-        
-        
       }
     }
 
@@ -190,9 +181,8 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
-    console.log("Reset password attempt with token:", token); 
+    console.log("Reset password attempt with token:", token);
 
-    
     if (!token || !newPassword) {
       return res.status(400).json({
         status: "error",
@@ -200,7 +190,6 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    
     if (newPassword.length < 6) {
       return res.status(400).json({
         status: "error",
@@ -208,13 +197,12 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    
     const admin = await Admin.findOne({
       resetToken: token,
-      resetTokenExpiry: { $gt: new Date() }, 
+      resetTokenExpiry: { $gt: new Date() },
     });
 
-    console.log("Admin found with token:", admin ? "Yes" : "No"); 
+    console.log("Admin found with token:", admin ? "Yes" : "No");
 
     if (!admin) {
       return res.status(400).json({
@@ -223,17 +211,15 @@ exports.resetPassword = async (req, res) => {
       });
     }
 
-    
-    const saltRounds = 12; 
+    const saltRounds = 12;
     admin.password = await bcrypt.hash(newPassword, saltRounds);
 
-    
     admin.resetToken = undefined;
     admin.resetTokenExpiry = undefined;
 
     await admin.save();
 
-    console.log("Password reset successful for admin:", admin.username); 
+    console.log("Password reset successful for admin:", admin.username);
 
     return res.json({
       status: "success",
@@ -249,12 +235,10 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-
 exports.forgotUsername = async (req, res) => {
   try {
     const { email } = req.body;
 
-    
     if (!email) {
       return res.status(400).json({
         status: "error",
@@ -276,7 +260,6 @@ exports.forgotUsername = async (req, res) => {
 
     if (admin) {
       try {
-        
         if (!process.env.EMAIL_USERNAME || !process.env.EMAIL_PASSWORD) {
           console.error("Email credentials not configured");
           return res.json({
@@ -285,7 +268,6 @@ exports.forgotUsername = async (req, res) => {
           });
         }
 
-        
         const transporter = nodemailer.createTransport({
           service: "Gmail",
           auth: {
@@ -298,7 +280,6 @@ exports.forgotUsername = async (req, res) => {
           },
         });
 
-        
         await transporter.verify();
         console.log("Email transporter verified");
 
@@ -325,12 +306,11 @@ exports.forgotUsername = async (req, res) => {
           text: `Username Recovery\n\nYour username is: ${admin.username}`,
         };
 
-        
         await transporter.sendMail(mailOptions);
         console.log("Email sent successfully");
       } catch (emailError) {
         console.error("Email sending error:", emailError);
-        
+
         if (process.env.NODE_ENV === "development") {
           return res.status(500).json({
             status: "error",
@@ -359,7 +339,6 @@ exports.isAuthenticated = (req, res, next) => {
   return res.status(401).json({ message: "Unauthorized" });
 };
 
-
 exports.listAdmins = async (req, res) => {
   try {
     const admins = await Admin.find({ role: "admin" });
@@ -373,12 +352,10 @@ exports.createAdmin = async (req, res) => {
   try {
     const { username, email, password, moduleAccess } = req.body;
 
-    
     if (!username || !email || !password) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
-    
     const existingEmail = await Admin.findOne({ email });
     if (existingEmail) {
       return res.status(400).json({ message: "Email already exists" });
@@ -389,7 +366,6 @@ exports.createAdmin = async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
 
-    
     const hashedPassword = await bcrypt.hash(password, 10);
     const newAdmin = new Admin({
       username,
@@ -447,5 +423,3 @@ exports.deleteAdmin = async (req, res) => {
     return res.status(500).json({ message: "Server error" });
   }
 };
-
-

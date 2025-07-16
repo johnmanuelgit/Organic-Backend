@@ -3,9 +3,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/User");
-const Admin = require("../models/defaultAdmin");
 
-// REGISTER
 exports.register = async (req, res) => {
   const { name, email, password } = req.body;
   const existingUser = await User.findOne({ email });
@@ -23,7 +21,6 @@ exports.register = async (req, res) => {
   }
 };
 
-// LOGIN
 exports.login = async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
@@ -52,7 +49,6 @@ exports.login = async (req, res) => {
   });
 };
 
-// PROFILE
 exports.profile = async (req, res) => {
   try {
     const user = await User.findById(req.params.id).select("-password");
@@ -65,7 +61,6 @@ exports.profile = async (req, res) => {
   }
 };
 
-// UPDATE PROFILE
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -84,7 +79,8 @@ exports.updateProfile = async (req, res) => {
       new: true,
     }).select("-password");
 
-    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+    if (!updatedUser)
+      return res.status(404).json({ message: "User not found" });
 
     res.json({ message: "Profile updated successfully", updatedUser });
   } catch (err) {
@@ -93,27 +89,28 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// FORGOT PASSWORD
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
     const user = await User.findOne({ email });
     if (!user)
-      return res.status(404).json({ message: "User not found with this email" });
+      return res
+        .status(404)
+        .json({ message: "User not found with this email" });
 
-    // Generate token
     const resetToken = crypto.randomBytes(32).toString("hex");
-    const hashedToken = crypto.createHash("sha256").update(resetToken).digest("hex");
+    const hashedToken = crypto
+      .createHash("sha256")
+      .update(resetToken)
+      .digest("hex");
 
     user.resetPasswordToken = hashedToken;
     user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
     await user.save();
 
-    const resetLink = `${
-          process.env.FRONTEND_URL
-        }/user-reset-password/${resetToken}`;
+    const resetLink = `${process.env.FRONTEND_URL}/user-reset-password/${resetToken}`;
     const html = `
-      <h3>Hi ${user.name || 'User'},</h3>
+      <h3>Hi ${user.name || "User"},</h3>
       <p>You requested a password reset.</p>
       <p>Click the link below to reset your password:</p>
        <a href="${resetLink}" style="color:black ">${resetLink}</a><br>
@@ -126,7 +123,6 @@ exports.forgotPassword = async (req, res) => {
       <p>This link will expire in 1 hour.</p>
     `;
 
-    // Send email using nodemailer directly
     const transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
@@ -175,5 +171,3 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
-

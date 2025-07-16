@@ -1,5 +1,5 @@
 const Cart = require("../models/Carts");
-const middleware = require("../middleware/auth");
+
 
 exports.getcart = async (req, res) => {
   try {

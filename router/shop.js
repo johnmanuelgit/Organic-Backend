@@ -5,7 +5,6 @@ const multer = require("multer");
 const path = require("path");
 const middleware = require("../middleware/auth");
 
-
 const storage = multer.diskStorage({
   destination: "uploads/",
   filename: (req, file, cb) => {
@@ -14,11 +13,20 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-
-router.post("/", upload.single("image"),middleware, productController.createProduct);
+router.post(
+  "/",
+  upload.single("image"),
+  middleware,
+  productController.createProduct
+);
 router.get("/:id", productController.getProduct);
-router.put("/:id", upload.single("image"),middleware, productController.updateProduct);
-router.delete("/:id",middleware, productController.deleteProduct);
+router.put(
+  "/:id",
+  upload.single("image"),
+  middleware,
+  productController.updateProduct
+);
+router.delete("/:id", middleware, productController.deleteProduct);
 router.get("/", productController.getAllProducts);
 
 module.exports = router;

@@ -13,7 +13,6 @@ exports.getProductReviews = async (req, res) => {
   }
 };
 
-
 exports.addReview = async (req, res) => {
   try {
     const { id } = req.params;
@@ -30,7 +29,7 @@ exports.addReview = async (req, res) => {
       rating,
       comment,
       userName,
-      userImageUrl, // Optional
+      userImageUrl,
     });
 
     await review.save();

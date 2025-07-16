@@ -16,14 +16,14 @@ const upload = multer({ storage });
 
 router.post("/register", authcontroller.register);
 router.post("/login", authcontroller.login);
-router.get("/profile/:id",middleware, authcontroller.profile);
+router.get("/profile/:id", middleware, authcontroller.profile);
 router.post("/forgot-password", authcontroller.forgotPassword);
 router.post("/reset-password", authcontroller.resetPassword);
 
-
 router.put(
   "/profile/:id",
-  upload.single("image"),middleware,
+  upload.single("image"),
+  middleware,
   authcontroller.updateProfile
 );
 

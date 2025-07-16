@@ -9,7 +9,6 @@ exports.getAllBlogs = async (req, res) => {
   }
 };
 
-
 exports.createBlog = async (req, res) => {
   const { title, content, category, author, date } = req.body;
   const image = req.file ? req.file.filename : "";
@@ -60,11 +59,9 @@ exports.getBlogById = async (req, res) => {
       category: blog.category,
       author: blog.author,
       date: blog.date,
-      image:blog.image,
+      image: blog.image,
     });
   } catch (err) {
     res.status(500).json({ error: "Failed to fetch blog" });
   }
 };
-
-
